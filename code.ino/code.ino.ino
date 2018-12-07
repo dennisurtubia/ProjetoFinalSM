@@ -1,5 +1,5 @@
+#include <EEPROM.h>
 #include <DS1307.h>
-
 #include <LiquidCrystal.h>
 #include <Keypad.h>
 
@@ -21,6 +21,12 @@ char keymap[numRows][numCols]=
 {'*', '0', '#', 'D'}
 };
 
+char * senhas[7] = {"1", "4444", "123456"};
+char * nomes[10] = {"Denna", "Jorg", "Otavio"};
+int qtdeSenhas = 3;
+
+int endereco = 0;
+
 byte rowPins[numRows] = {30,31,32,33}; //Rows 0 to 3
 byte colPins[numCols]= {34,35,36,37}; //Columns 0 to 3
 
@@ -41,15 +47,11 @@ void setup()
   lcd.setCursor(2, 2);
   lcd.print("Digite sua senha");
 
+  rtc.halt(false);
 
-    rtc.halt(false);
-   
-  //As linhas abaixo setam a data e hora do modulo
-  //e podem ser comentada apos a primeira utilizacao
   rtc.setDOW(FRIDAY);      //Define o dia da semana
-  rtc.setTime(20, 37, 0);     //Define o horario
-  rtc.setDate(6, 6, 2014);   //Define o dia, mes e ano
-   
+  rtc.setTime(15, 16, 0);     //Define o horario
+  rtc.setDate(7, 12, 2018);   //Define o dia, mes e ano
   //Definicoes do pino SQW/Out
   rtc.setSQWRate(SQW_RATE_1);
   rtc.enableSQW(true);
@@ -69,10 +71,33 @@ void loop()
         lcd.setCursor(6, 2);
         firstPress = 0;
       }
-      
-      
+
+      if (keypressed == 'A') {
+        for (int i = 0; i < endereco; i++) {
+          Serial.print((char)EEPROM.read(i));
+        }
+        Serial.println("aaaaaaaaaaaaa");
+      }
       if (keypressed == 'D') {
-        Serial.println("Confirmando");
+        Serial.println("Verificando");
+        delay(100);
+        int a = 0;
+        for(int i = 0; i < qtdeSenhas; i++) {
+          if (strcmp((char *)input, (char *)senhas[i]) == 0) {
+              int tam = strlen(nomes[i]) + strlen(rtc.getTimeStr()) + strlen(rtc.getDateStr(FORMAT_SHORT)) + 1;
+              char AUX[tam];
+              
+             sprintf(AUX, "%s - %s:%s", nomes[i], rtc.getDateStr(FORMAT_SHORT), rtc.getTimeStr());
+             for (int j = 0; j < tam; j++, endereco++) {
+                EEPROM.write(endereco, AUX[j]);
+             }
+             
+             Serial.println(AUX);
+             Serial.println("Confirmando");
+             a += 1;
+          }
+        }
+        if (a == 0) Serial.println("Senha Incorreta");
       } else {
         if (inputCount < 6)
         {
@@ -82,13 +107,15 @@ void loop()
       }
     }
 
-      Serial.print("Hora : ");
-  Serial.print(rtc.getTimeStr());
-  Serial.print(" ");
-  Serial.print("Data : ");
-  Serial.print(rtc.getDateStr(FORMAT_SHORT));
-  Serial.print(" ");
-  Serial.println(rtc.getDOWStr(FORMAT_SHORT));
+//  Serial.print("Hora : ");
+  String a = rtc.getTimeStr();
+  Serial.println(a);
+//  Serial.println(rtc.getTimeStr());
+//  Serial.print(" ");
+//  Serial.print("Data : ");
+//  Serial.print(rtc.getDateStr(FORMAT_SHORT));
+//  Serial.print(" ");
+//  Serial.println(rtc.getDOWStr(FORMAT_SHORT));
    
   //Aguarda 1 segundo e repete o processo
   delay (1000);
