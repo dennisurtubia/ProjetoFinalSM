@@ -56,12 +56,29 @@ void setup()
   rtc.halt(false);
 
   rtc.setDOW(FRIDAY);       //Define o dia da semana
-  rtc.setTime(15, 16, 0);   //Define o horario
-  rtc.setDate(7, 12, 2018); //Define o dia, mes e ano
+  rtc.setTime(17, 50, 0);   //Define o horario
+  rtc.setDate(12, 12, 2018); //Define o dia, mes e ano
   //Definicoes do pino SQW/Out
   rtc.setSQWRate(SQW_RATE_1);
   rtc.enableSQW(true);
   Serial.begin(9600);
+}
+
+void reset()
+{
+
+  digitalWrite(LED_SUCESSO, LOW);
+  digitalWrite(LED_ERRO, LOW);  
+
+    lcd.clear();
+  lcd.setCursor(5, 0);
+  lcd.print("Bem vindo!");
+
+  firstPress = 1;
+  inputCount = 0;
+
+  for (int i = 0; i < 6; i++)
+    input[i] = 0;
 }
 
 void loop()
@@ -88,7 +105,6 @@ void loop()
       {
         Serial.print((char)EEPROM.read(i));
       }
-      Serial.println("aaaaaaaaaaaaa");
     }
     if (keypressed == 'D')
     {
@@ -116,6 +132,10 @@ void loop()
           digitalWrite(LED_ERRO, LOW);
 
           tone(BUZZER, 262, 200);
+
+          delay(1500);
+          reset();
+          
         }
       }
       if (a == 0)
@@ -125,6 +145,9 @@ void loop()
         digitalWrite(LED_ERRO, HIGH);
 
         tone(BUZZER, 262, 200);
+
+          delay(1500);
+          reset();
       }
     }
     else
@@ -148,5 +171,5 @@ void loop()
   //  Serial.println(rtc.getDOWStr(FORMAT_SHORT));
 
   //Aguarda 1 segundo e repete o processo
-  delay(1000);
+ 
 }
