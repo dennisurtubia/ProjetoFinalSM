@@ -5,6 +5,7 @@
 
 #define LED_SUCESSO 10
 #define LED_ERRO 11
+#define BUZZER 12
 
 // Pinos display
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
@@ -69,6 +70,9 @@ void loop()
   char keypressed = myKeypad.getKey();
   if (keypressed != NO_KEY)
   {
+
+    tone(BUZZER, 262, 200);
+
     if (firstPress == 1)
     {
       lcd.clear();
@@ -110,6 +114,8 @@ void loop()
 
           digitalWrite(LED_SUCESSO, HIGH);
           digitalWrite(LED_ERRO, LOW);
+
+          tone(BUZZER, 262, 200);
         }
       }
       if (a == 0)
@@ -117,6 +123,8 @@ void loop()
         Serial.println("Senha Incorreta");
         digitalWrite(LED_SUCESSO, LOW);
         digitalWrite(LED_ERRO, HIGH);
+
+        tone(BUZZER, 262, 200);
       }
     }
     else
