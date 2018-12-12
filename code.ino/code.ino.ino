@@ -3,19 +3,17 @@
 #include <LiquidCrystal.h>
 #include <Keypad.h>
 
-#define LED_SUCESSO 10
-#define LED_ERRO 11
-#define BUZZER 12
+#define LED_SUCESSO 10 //porta do LED_SUCESSO 10
+#define LED_ERRO 11 //porta do LED_ERRO 11
+#define BUZZER 12 //porta do buzzer 12
 
-// Pinos display
-LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+LiquidCrystal lcd(7, 6, 5, 4, 3, 2); // Pinos display
 
-DS1307 rtc(8, 9);
+DS1307 rtc(8, 9); //define as portas do rtc
 
-const byte numRows = 4; //number of rows on the keypad
-const byte numCols = 4; //number of columns on the keypad
+const byte numRows = 4; //número de linhas do teclado
+const byte numCols = 4; //número de colunas do teclado
 
-/*keymap defines the key pressed according to the row and columns just as appears on the keypad*/
 char keymap[numRows][numCols] =
     {
         {'1', '2', '3', 'A'},
@@ -23,26 +21,26 @@ char keymap[numRows][numCols] =
         {'7', '8', '9', 'C'},
         {'*', '0', '#', 'D'}};
 
-char *senhas[7] = {"1", "4444", "123456"};
-char *nomes[10] = {"Denna", "Jorg", "Otavio"};
-int qtdeSenhas = 3;
+char *senhas[7] = {"1", "4444", "123456"}; //vetor para armazenar as senhas
+char *nomes[10] = {"Denna", "Jorg", "Otavio"}; //vetor para salvar nome de usuários
+int qtdeSenhas= 3; //quantidade de senhas
 
 int endereco = 0;
 
-byte rowPins[numRows] = {30, 31, 32, 33}; //Rows 0 to 3
-byte colPins[numCols] = {34, 35, 36, 37}; //Columns 0 to 3
+byte rowPins[numRows] = {30, 31, 32, 33}; //define as portas das linhas do teclado 4x4
+byte colPins[numCols] = {34, 35, 36, 37}; //define as portas das colunas do teclado 4x4
 
 Keypad myKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
 
-char input[6];
-int inputCount = 0;
-int firstPress = 1;
+char input[6]; //vetor que armazena a senha lida do usuário com máximo 6 digitos
+int inputCount = 0; //contador do tamanho da senha inserida
+int firstPress = 1; //verifica se é o primeiro digito do usuário
 
 void setup()
 {
 
-  pinMode(LED_SUCESSO, OUTPUT);
-  pinMode(LED_ERRO, OUTPUT);
+  pinMode(LED_SUCESSO, OUTPUT); //Habilita a porta do led como saída
+  pinMode(LED_ERRO, OUTPUT); //Habilita a porta do led como saída
 
   lcd.leftToRight();
   lcd.begin(20, 4);
