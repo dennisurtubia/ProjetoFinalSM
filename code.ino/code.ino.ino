@@ -32,7 +32,7 @@ byte colPins[numCols] = {34, 35, 36, 37}; //define as portas das colunas do tecl
 
 Keypad myKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
 
-char input[6]; //vetor que armazena a senha lida do usuário com máximo 6 digitos
+char input[7]; //vetor que armazena a senha lida do usuário com máximo 6 digitos
 int inputCount = 0; //contador do tamanho da senha inserida
 int firstPress = 1; //verifica se é o primeiro digito do usuário
 
@@ -54,8 +54,8 @@ void setup()
   rtc.halt(false);
 
   rtc.setDOW(FRIDAY);       //Define o dia da semana
-  rtc.setTime(17, 50, 0);   //Define o horario
-  rtc.setDate(12, 12, 2018); //Define o dia, mes e ano
+  //rtc.setTime(10, 20, 0);   //Define o horario
+   //rtc.setDate(13, 12, 2018); //Define o dia, mes e ano
   //Definicoes do pino SQW/Out
   rtc.setSQWRate(SQW_RATE_1);
   rtc.enableSQW(true);
@@ -106,21 +106,24 @@ void loop()
       {
         Serial.print((char)EEPROM.read(i));
       }
+      endereco = 0;
     }
-    if (keypressed == 'D') // Botão "D" pressionado
+    else if (keypressed == 'C') // Botão "D" pressionado
     {
       Serial.println("Verificando");
       delay(100);
       int a = 0;
       for (int i = 0; i < qtdeSenhas; i++) // loop entre as senha cadastradas
       {
-        if (strcmp((char *)input, (char *)senhas[i]) == 0) // caso a senha seja encontrada
+        if (strcmp(input, senhas[i]) == 0) // caso a senha seja encontrada
         {
-          int tam = strlen(nomes[i]) + strlen(rtc.getTimeStr()) + strlen(rtc.getDateStr(FORMAT_SHORT)) + 1; // tamanho em bytes que vão ser armazenados na EEPROM
-          char AUX[tam];
-
-          sprintf(AUX, "%s - %s:%s", nomes[i], rtc.getDateStr(FORMAT_SHORT), rtc.getTimeStr()); // NOME do usuário, data e hora de acesso
-          for (int j = 0; j < tam; j++, endereco++)
+          String timer = rtc.getTimeStr();
+          String data = rtc.getDateStr(FORMAT_SHORT);
+          
+          char AUX[100];
+          //String aux1 = rtc.getTimeStr();
+          sprintf(AUX, "%s - %s:%s\n", nomes[i], data.c_str(), timer.c_str()); // NOME do usuário, data e hora de acesso
+          for (int j = 0; j < strlen(AUX); j++, endereco++)
           {
             EEPROM.write(endereco, AUX[j]); // grava byte a byte na EEPROM
           }
@@ -160,4 +163,5 @@ void loop()
       }
     }
   }
+  
 }
