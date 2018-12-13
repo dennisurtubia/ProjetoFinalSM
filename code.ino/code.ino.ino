@@ -68,13 +68,16 @@ void reset()
   digitalWrite(LED_SUCESSO, LOW);
   digitalWrite(LED_ERRO, LOW);  
 
-    lcd.clear();
+  // Limpa o display e posiciona o cursor no local correto
+    lcd.clear(); 
   lcd.setCursor(5, 0);
   lcd.print("Bem vindo!");
 
+  // ativa novamente as flags de controle
   firstPress = 1;
   inputCount = 0;
 
+  // "limpa" a string auxiliar da senha
   for (int i = 0; i < 6; i++)
     input[i] = 0;
 }
@@ -82,14 +85,14 @@ void reset()
 void loop()
 {
 
-  char keypressed = myKeypad.getKey();
+  char keypressed = myKeypad.getKey(); // coleta a tecla digitada
   if (keypressed != NO_KEY)
   {
 
     tone(BUZZER, 262, 200);
 
-    if (firstPress == 1)
-    {
+    if (firstPress == 1) // primeiro digito da senha
+    { // limpa o display
       lcd.clear();
       lcd.setCursor(5, 0);
       lcd.print("Bem vindo!");
@@ -97,46 +100,46 @@ void loop()
       firstPress = 0;
     }
 
-    if (keypressed == 'A')
+    if (keypressed == 'A') // Caso a tecla "A" seja clicada, os dados que estão na EEPROM vão ser passados para o terminal serial do computador
     {
-      for (int i = 0; i < endereco; i++)
+      for (int i = 0; i < endereco; i++) // endereço é a quantidade de bytes armazenados na EEPROM até o momento
       {
         Serial.print((char)EEPROM.read(i));
       }
     }
-    if (keypressed == 'D')
+    if (keypressed == 'D') // Botão "D" pressionado
     {
       Serial.println("Verificando");
       delay(100);
       int a = 0;
-      for (int i = 0; i < qtdeSenhas; i++)
+      for (int i = 0; i < qtdeSenhas; i++) // loop entre as senha cadastradas
       {
-        if (strcmp((char *)input, (char *)senhas[i]) == 0)
+        if (strcmp((char *)input, (char *)senhas[i]) == 0) // caso a senha seja encontrada
         {
-          int tam = strlen(nomes[i]) + strlen(rtc.getTimeStr()) + strlen(rtc.getDateStr(FORMAT_SHORT)) + 1;
+          int tam = strlen(nomes[i]) + strlen(rtc.getTimeStr()) + strlen(rtc.getDateStr(FORMAT_SHORT)) + 1; // tamanho em bytes que vão ser armazenados na EEPROM
           char AUX[tam];
 
-          sprintf(AUX, "%s - %s:%s", nomes[i], rtc.getDateStr(FORMAT_SHORT), rtc.getTimeStr());
+          sprintf(AUX, "%s - %s:%s", nomes[i], rtc.getDateStr(FORMAT_SHORT), rtc.getTimeStr()); // NOME do usuário, data e hora de acesso
           for (int j = 0; j < tam; j++, endereco++)
           {
-            EEPROM.write(endereco, AUX[j]);
+            EEPROM.write(endereco, AUX[j]); // grava byte a byte na EEPROM
           }
 
           Serial.println(AUX);
           Serial.println("Confirmando");
           a += 1;
 
-          digitalWrite(LED_SUCESSO, HIGH);
+          digitalWrite(LED_SUCESSO, HIGH); // led de comfirmado
           digitalWrite(LED_ERRO, LOW);
 
           tone(BUZZER, 262, 200);
 
           delay(1500);
-          reset();
+          reset(); /// Limpa o display
           
         }
       }
-      if (a == 0)
+      if (a == 0) /// caso não encontre a senha digitada
       {
         Serial.println("Senha Incorreta");
         digitalWrite(LED_SUCESSO, LOW);
@@ -148,26 +151,13 @@ void loop()
           reset();
       }
     }
-    else
+    else // qualquer outro simbolo usado na senha
     {
       if (inputCount < 6)
       {
-        input[inputCount++] = keypressed;
+        input[inputCount++] = keypressed; // salvo em uma string aux
         lcd.print('*');
       }
     }
   }
-
-  //  Serial.print("Hora : ");
-  String a = rtc.getTimeStr();
-  Serial.println(a);
-  //  Serial.println(rtc.getTimeStr());
-  //  Serial.print(" ");
-  //  Serial.print("Data : ");
-  //  Serial.print(rtc.getDateStr(FORMAT_SHORT));
-  //  Serial.print(" ");
-  //  Serial.println(rtc.getDOWStr(FORMAT_SHORT));
-
-  //Aguarda 1 segundo e repete o processo
- 
 }
